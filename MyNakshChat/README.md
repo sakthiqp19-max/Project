@@ -1,97 +1,307 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# MyNaksh Chat – React Native Technical Assessment
 
-# Getting Started
+This project implements an **interactive astrology chat interface** for the MyNaksh platform.
+The focus of the assignment is on **smooth micro-interactions, gesture-based UI, and animated feedback** using modern React Native tools.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+The chat experience supports:
 
-## Step 1: Start Metro
+* Swipe-to-Reply interactions
+* Long-press emoji reactions
+* AI message feedback (Like / Dislike with feedback chips)
+* End chat rating flow
+* Smooth UI animations using Reanimated
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+The goal was to demonstrate **clean architecture, smooth animations, and responsive gesture handling**.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+# Tech Stack
 
-# OR using Yarn
-yarn start
+* React Native
+* TypeScript
+* React Native Reanimated 3
+* React Native Gesture Handler
+* Redux Toolkit
+
+---
+
+# Project Setup
+
+## 1. Install dependencies
+
+```bash
+npm install
 ```
 
-## Step 2: Build and run your app
+## 2. Start Metro
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+npx react-native start
 ```
 
-### iOS
+## 3. Run Android
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+npx react-native run-android
 ```
 
-Then, and every time you update your native dependencies, run:
+---
 
-```sh
-bundle exec pod install
+# Features Implemented
+
+## 1. Swipe to Reply
+
+Users can swipe a message bubble to the right to initiate a reply.
+
+Interaction flow:
+
+```
+Swipe message → reply icon appears
+Release → message springs back
+Reply preview appears above the input
+Cancel clears reply state
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+The message position is animated using **Reanimated shared values**, and the gesture is handled with **React Native Gesture Handler Pan gesture**.
 
-```sh
-# Using npm
-npm run ios
+---
 
-# OR using Yarn
-yarn ios
+## 2. Message Reactions (Long Press)
+
+Long-pressing a message displays a horizontal emoji reaction bar.
+
+Example reactions:
+
+```
+🙏 ✨ 🌙
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+When an emoji is selected:
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```
+emoji → attached below message bubble
+reaction stored in Redux state
+emoji bar closes
+```
 
-## Step 3: Modify your app
+This interaction is designed to feel **similar to WhatsApp-style reactions**.
 
-Now that you have successfully run the app, let's make changes!
+---
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## 3. AI Message Feedback
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+Messages sent by the AI astrologer display a **Like / Dislike toggle**.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+When Dislike is selected:
 
-## Congratulations! :tada:
+```
+👎 pressed
+↓
+Feedback chips expand
+[Inaccurate] [Too Vague] [Too Long]
+↓
+Selecting a chip updates local state
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+The feedback chips are animated using **Reanimated layout transitions** to create a smooth expansion effect.
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 4. Session Termination and Rating
 
-# Troubleshooting
+An **End Chat** button is available in the header.
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+When pressed:
 
-# Learn More
+```
+End Chat
+↓
+Full screen overlay appears
+↓
+5-star rating component shown
+↓
+User selects rating
+↓
+Alert confirms rating submission
+```
 
-To learn more about React Native, take a look at the following resources:
+This simulates a typical **post-session feedback flow**.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+# How Reanimated 3 Was Used
+
+React Native Reanimated was used to create **smooth, high-performance animations**.
+
+Key use cases:
+
+### Swipe-to-Reply animation
+
+A shared value tracks the horizontal translation of the message bubble.
+
+```
+translateX.value = e.translationX
+```
+
+When the gesture ends, the bubble springs back using:
+
+```
+withSpring(0)
+```
+
+Because Reanimated uses **worklets**, the animation runs on the **UI thread**, preventing frame drops and ensuring smooth interactions.
+
+---
+
+### Layout animations
+
+Reanimated layout transitions were used for:
+
+* Emoji reaction bar appearance
+* AI feedback chip expansion
+* UI state transitions
+
+Example:
+
+```
+layout={LinearTransition.springify()}
+```
+
+This provides **smooth animated layout changes** without manual animation code.
+
+---
+
+# Gesture Handling Approach
+
+Gestures are implemented using **React Native Gesture Handler**.
+
+The swipe-to-reply interaction uses a **Pan gesture**:
+
+```
+Gesture.Pan()
+```
+
+Gesture flow:
+
+```
+onUpdate → track swipe distance
+onEnd → check threshold
+if threshold reached → trigger reply
+else → reset animation
+```
+
+Important implementation detail:
+
+* Gesture logic runs in **Reanimated worklets**
+* This allows gesture updates to run on the **UI thread instead of the JS thread**
+
+Benefits:
+
+* No frame drops
+* Smooth gesture tracking
+* Responsive UI interactions
+
+---
+
+# State Management Choice
+
+Redux Toolkit was used for global state management.
+
+Redux stores the following chat state:
+
+```
+messages
+replyMessage
+message reactions
+```
+
+Example store structure:
+
+```
+chat
+ ├── messages
+ ├── replyMessage
+```
+
+Reasons for choosing Redux Toolkit:
+
+* Predictable state management
+* Centralized chat state
+* Easier debugging
+* Scalable architecture for larger apps
+
+Redux also ensures message updates (reactions, replies) automatically trigger UI updates.
+
+---
+
+# Folder Structure
+
+```
+src
+ ├── components
+ │   ├── MessageBubble.tsx
+ │   ├── EmojiReactionBar.tsx
+ │   ├── ReplyPreview.tsx
+ │   ├── AIMessageFeedback.tsx
+ │   ├── RatingOverlay.tsx
+ │   └── StarRating.tsx
+ │
+ ├── screens
+ │   └── ChatScreen.tsx
+ │
+ ├── store
+ │   ├── index.ts
+ │   └── chatSlice.ts
+ │
+ ├── gestures
+ │   └── swipeReplyGesture.ts
+ │
+ ├── constants
+ │   ├── theme.ts
+ │   └── mockMessages.ts
+ │
+ ├── utils
+ │   └── formatTime.ts
+ │
+ └── types
+     └── message.ts
+```
+
+This structure separates **UI components, gestures, and state management** for better maintainability.
+
+---
+
+# Performance Considerations
+
+The following practices were used to maintain performance:
+
+* Reanimated worklets for gesture logic
+* UI thread animations
+* FlatList virtualization for message rendering
+* Redux state updates scoped to specific messages
+
+This ensures smooth interactions even when message count grows.
+
+---
+
+# Demo
+
+The demo video shows:
+
+* Swipe-to-Reply interaction
+* Long-press emoji reactions
+* AI feedback chips
+* End chat rating flow
+
+---
+
+# Conclusion
+
+This implementation focuses on **interactive chat micro-interactions**, demonstrating:
+
+* Gesture-driven UI
+* Smooth animations
+* Clean state management
+* Scalable component architecture
+
+The solution prioritizes **performance, clarity, and maintainability**, which are critical for production React Native applications.
